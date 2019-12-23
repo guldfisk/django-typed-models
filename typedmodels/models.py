@@ -13,7 +13,6 @@ from django.db.models.base import ModelBase
 from django.db.models.fields import Field
 from django.db.models.options import make_immutable_fields_list
 from django.utils.encoding import smart_text
-from django.utils.six import with_metaclass
 
 
 class TypedModelManager(models.Manager):
@@ -237,7 +236,7 @@ class TypedModelMetaclass(ModelBase):
         cls._meta._expire_cache()
 
 
-class TypedModel(with_metaclass(TypedModelMetaclass, models.Model)):
+class TypedModel(models.Model, metaclass=TypedModelMetaclass):
     '''
     This class contains the functionality required to auto-downcast a model based
     on its ``type`` attribute.
