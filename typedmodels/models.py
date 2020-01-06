@@ -143,6 +143,7 @@ class TypedModelMetaclass(ModelBase):
                     )
                 )
             base_class._typedmodels_registry[typ] = cls
+            base_class._typedmodels_simple_registry[cls.__name__] = cls
 
             type_name = getattr(cls._meta, 'verbose_name', cls.__name__)
             type_field = base_class._meta.get_field('type')
@@ -165,6 +166,7 @@ class TypedModelMetaclass(ModelBase):
         else:
             # this is the base class
             cls._typedmodels_registry = {}
+            cls._typedmodels_simple_registry = {}
 
             # Since fields may be added by subclasses, save original fields.
             cls._meta._typedmodels_original_fields = cls._meta.fields
@@ -237,38 +239,6 @@ class TypedModelMetaclass(ModelBase):
 
 
 class TypedModel(models.Model, metaclass=TypedModelMetaclass):
-    '''
-    This class contains the functionality required to auto-downcast a model based
-    on its ``type`` attribute.
-
-    To use, simply subclass TypedModel for your base type, and then subclass
-    that for your concrete types.
-
-    Example usage::
-
-        from django.db import models
-        from typedmodels.models import TypedModel
-
-        class Animal(TypedModel):
-            """
-            Abstract model
-            """
-            name = models.CharField(max_length=255)
-
-            def say_something(self):
-                raise NotImplemented
-
-            def __repr__(self):
-                return u'<%s: %s>' % (self.__class__.__name__, self.name)
-
-        class Canine(Animal):
-            def say_something(self):
-                return "woof"
-
-        class Feline(Animal):
-            def say_something(self):
-                return "meoww"
-    '''
     objects = TypedModelManager()
 
     type = models.CharField(choices=(), max_length=255, null=False, blank=False, db_index=True)
